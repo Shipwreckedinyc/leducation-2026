@@ -84,6 +84,12 @@
   .ev.sz-xs .etime { font-size: 9px; margin-bottom: 0; }
   .ev.sz-xs .chips { gap: 2px; } .ev.sz-xs .chip { font-size: 8px; padding: 0 3px; }
 
+  /* NO TEAM ATTENDING */
+  .ev.empty { opacity: 0.85; border-style: dotted; border-color: var(--border2); background: var(--bg); }
+  .ev.empty .etitle { color: var(--dim); }
+  .ev.empty .etime { color: var(--dim); }
+  .ev.empty .no-team { font-size: 9px; color: var(--dim); font-style: italic; }
+
   /* EMPTY STATE */
   .empty-day { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 13px; }
 
@@ -136,6 +142,10 @@ const DAYS=[
 
 const S=[
 // ── THU ──
+{day:"thu",s:T(9,0),e:T(10,0),t:"Digital Practice Management with BIM Focus",
+ sp:"Samuel Mikhail, 4 Ideal Design",
+ desc:"BIM is transforming how architects, lighting designers, and manufacturers collaborate and manage projects. This session explores how digital practice management helps firms streamline workflows, improve coordination, and maintain strong BIM standards. Attendees will learn how to develop efficient BIM templates, train teams effectively, and integrate BIM into their lighting and architectural workflows.",
+ v:1,rm:"",lv:"Introductory · 1 LU | Elective",w:[]},
 {day:"thu",s:T(10,15),e:T(11,15),t:"Lighting Design for Revit using TM32 and IFC",
  sp:"Friedrich Wilhelm Bremecker, DIAL",
  desc:"Lighting design requires both specialized expertise and dedicated tools. General BIM software excels in architecture but falls short on lighting details. The new IES TM-32 defines the essential luminaire data for accurate BIM-based lighting design. DIALux fully supports this standard: over 450 manufacturers supply product data, and results integrate seamlessly with BIM authoring tools via IFC (OpenBIM) or a dedicated Revit App (ClosedBIM).",
@@ -162,10 +172,18 @@ const S=[
  v:1,rm:"",lv:"Intermediate · 1 LU | HSW",w:["Nick","Josh","Andrew"]},
 
 // ── FRI ──
+{day:"fri",s:T(9,0),e:T(10,0),t:"BUG Ratings: Simply Explained & Considered",
+ sp:"Paul Mitchell, ST Engineering Telematics Wireless",
+ desc:"BUG ratings are the Luminaire Classification System (LCS) introduced by IES. As they become integrated into outdoor lighting ordinances, BUG ratings are commonly misunderstood and misapplied, sometimes resulting in less safe roadway or area applications. Understand the strengths and weaknesses of BUG ratings to properly apply this metric in your design.",
+ v:1,rm:"",lv:"Intermediate · 1 LU | HSW",w:[]},
 {day:"fri",s:T(10,15),e:T(11,15),t:"Beyond NLCs: What Is Next For Connected Lighting",
  sp:"Simon Slupik, Silvair / Chair, Bluetooth Mesh Working Group (Bluetooth SIG)",
  desc:"High-end trim, dimming, occupancy/vacancy, and daylight harvesting have been mainstream applications for connected lighting systems. But this is just a beginning, as bringing connectivity to lighting systems can offer much more.",
  v:1,rm:"",lv:"Introductory · 1 LU | HSW",w:["Nick"]},
+{day:"fri",s:T(11,30),e:T(12,30),t:"The AB3s of Effective Project Labeling",
+ sp:"Stephen Cannella, Synapse Audio Visual Designs, LLC",
+ desc:"The increasingly complex landscape of LED lighting fixtures and their controls often leave designers conflicted on what approach is best to convey the vast amount of data involved. This course classifies key project information and best practices for conveying it in a manner that invites clarity, avoids friction in procurement, removes scope gaps, and adds flexibility from project inception to as-builts.",
+ v:1,rm:"",lv:"Intermediate · 1 LU | HSW",w:[]},
 {day:"fri",s:T(13,0),e:T(14,30),t:"Hospitality Lighting Case Studies at Scale: Dynamic Lighting on Network Controls",
  sp:"Panel: Tyler Andrews (PoE Texas), Mark Simpson (Celano Design Studio), Joe Herbst (PoE Texas)",
  desc:"Two successful luxury hospitality case studies focused on user experience using Power over Ethernet (PoE) lighting controls: Black Desert Resort (2M sqft) and Resorts World's Villa 66 (exclusive penthouse suite). Includes video footage and project participants.",
@@ -188,6 +206,10 @@ const S=[
  sp:"Paul Kennedy and Veena Cagle, U.S. Outdoor Lighting",
  desc:"Lighting project requirements for BAA and BABA have increased complexity for current and future compliance, while changing tariffs have further challenged manufacturers, reps, and specifiers. This presentation simplifies understanding of compliance challenges while providing tools to optimize product design and selections, especially considering changing requirements and future uncertainty.",
  v:0,rm:"Sutton South",lv:"Intermediate · 1 LU | Elective",w:["Nick","Lizzy"]},
+{day:"tue",s:T(10,0),e:T(11,0),t:"Rugged ITS: Deployment in Rural and Remote Locations",
+ sp:"Matt Pollard, Leadsun, Inc.",
+ desc:"Rural and remote areas present unique challenges in supporting situational awareness and effective network, incident, and disaster management. Crashes in remote locations tend to be more severe because of delays before help arrives. This presentation explores deploying intelligent transportation system solutions in these challenging environments.",
+ v:0,rm:"Nassau",lv:"Introductory · 1 LU | HSW",w:[]},
 {day:"tue",s:T(10,30),e:T(11,30),t:"Future of LED Drivers",
  sp:"Michael Kulkarni, Sintel Power Systems (Division of Sintel Inc.)",
  desc:"What does the Next Generation LED Driver look like? Can we make smaller fixtures with less materials that are greener and less reliant on global supply chains?",
@@ -204,6 +226,10 @@ const S=[
  sp:"Panel: JP Bedell (SDA Lighting), Scott Hay (Reveal Design Group), Michael Hennes (Cline Bettridge Bernstein), C. Brooke Silber (Borealis Studio / BR+A), Dorothy Underwood (KGM Lighting)",
  desc:"Explores the value of distinguishing between lighting design and lighting consultation. Consultation typically involves basic layouts, code compliance, and performance-based specs. Lighting design integrates artistic vision, technical rigor, and detailed mockups. The panel debates whether defining these roles more clearly could protect design integrity, clarify contracts, and reflect real-world project scopes.",
  v:0,rm:"Sutton North",lv:"Intermediate · 1.5 LU | Elective",w:["Lizzy","Josh","Andrew"]},
+{day:"tue",s:T(13,0),e:T(14,0),t:"Lighting in Trauma-Informed Design",
+ sp:"Mariel Acevedo, ALR and Amanda Schaneman, ETC",
+ desc:"Trauma Informed Design (TID) focuses on creating low-stress, comfortable, and supportive spaces for people who have experienced or are currently in a traumatic event. Constant throughlines include safety, connection to nature, control of the space, autonomy, and low stress. Lighting and its interaction with interior design and architecture plays a massive role in the successful implementation of TID practices.",
+ v:0,rm:"Sutton South",lv:"Intermediate · 1 LU | HSW",w:[]},
 {day:"tue",s:T(13,30),e:T(14,30),t:"Egos, Intuition, & Lumens: Decoding the Architect's Mind",
  sp:"Brian Maite (ALW, an LMPG Brand) and Katie Hawk (FSA Lighting)",
  desc:"Architects balance countless technical responsibilities with instinct and vision, communicating in language that is uniquely \"Architect.\" This creates communication gaps with lighting professionals. Former architects and PMs now in lighting explore where disconnects arise and the importance of bridging the language of lighting.",
@@ -226,6 +252,22 @@ const S=[
  v:0,rm:"Sutton North",lv:"Introductory · 1 LU | Elective",w:["Lizzy","Maya"]},
 
 // ── WED ──
+{day:"wed",s:T(9,0),e:T(10,0),t:"Integrating VR into Lighting Design: Vision and Application",
+ sp:"Xiaoxiao Cui, Bard, Rao + Athanas Consulting Engineers",
+ desc:"Explores the potential of integrating Virtual Reality in lighting design. Begins with research on lighting psychology in immersive environments, revisiting John Flynn's Lighting Modes Theory. Then shifts to application: how VR can be integrated into design workflows, when and for whom it is most effective, and where it adds value. Concludes with a live VR lighting demonstration.",
+ v:0,rm:"Nassau",lv:"Intermediate · 1 LU | HSW",w:[]},
+{day:"wed",s:T(9,0),e:T(10,30),t:"Sustainable Lighting: A Perspective from the Value Chain",
+ sp:"Panel: Maurice Loosschilder (Signify), Migda Colon-Dieppa (Columbia University Facilities), Beth Brenner (Signify)",
+ desc:"What is sustainable lighting? This panel provides perspectives along the value chain including the end user, the lighting designer, the installer, and the manufacturer. Panel participants address how they design, procure, and implement sustainable choices and manage stakeholders, sharing real-world examples and guidelines to achieve sustainability goals.",
+ v:0,rm:"Sutton North",lv:"Introductory · 1.5 LU | HSW",w:[]},
+{day:"wed",s:T(9,30),e:T(11,0),t:"Exploring Emerging Battery Technology",
+ sp:"Panel: Sima Tawakoli, Renee Borg, and Todd Judd, sixteen5hundred",
+ desc:"Explores the critical role of advanced battery technologies in addressing energy needs for remote, off-grid, and extreme environments. Highlights California's leadership in clean energy and its goal of 100% clean electricity by 2045.",
+ v:0,rm:"Sutton South",lv:"Intermediate · 1.5 LU | HSW",w:[]},
+{day:"wed",s:T(10,30),e:T(11,30),t:"Specifying Networks for Streaming Lighting Protocols",
+ sp:"Nick Gonsman and Kirk Starks, ETC, Inc.",
+ desc:"Streaming lighting protocols (Art-Net, sACN) are becoming more prevalent in large lighting control systems, and networks to support these protocols have specific requirements. This session covers how streaming lighting protocols traverse a network (multicast), specifications for topologies and switchgear, configuration guidelines, and utilizing shared networks.",
+ v:0,rm:"Nassau",lv:"Intermediate · 1 LU | HSW",w:[]},
 {day:"wed",s:T(11,0),e:T(12,30),t:"21st Century Lighting Technology & Historic Artifacts, Fine Art, Ancient Infrastructure",
  sp:"Panel: Megan Carroll (IES), Amy Nelson (The Metropolitan Museum of Art), Naomi Miller (PNNL, FIES, FIALD)",
  desc:"Technology's impact and opportunity illuminating ancient art and objects in old infrastructure and new construction; converting from incandescent to LEDs in a world-class cultural institution.",
@@ -234,6 +276,18 @@ const S=[
  sp:"Francesca Bastianini, Sighte Studio",
  desc:"The criminological Broken Windows Theory suggests visible signs of neglect invite further disorder. Applied to lighting, this is about how the pursuit of efficiency and cost savings can erode community pride. High-output, low-cost fixtures may illuminate broadly but often create glare and the perception of surveillance rather than care. Explores strategies for working with municipalities to prioritize quality and human experience.",
  v:0,rm:"Sutton South",lv:"Introductory · 1 LU | HSW",w:["Josh","Maya"]},
+{day:"wed",s:T(12,0),e:T(13,0),t:"Next Level Lighting and Controls: A Guide to Lighting Features in WELL v2",
+ sp:"Scott Garrett, Lutron Electronics",
+ desc:"Explores the critical role of lighting in promoting health, comfort, and performance within the built environment. Examines the WELL Building Standard v2 framework, with emphasis on daylight access, glare control, shading, and window proximity. Strategies for daylight simulation in lighting design will be introduced. Also highlights how light quality, color rendering, and controllability affect satisfaction and safety.",
+ v:0,rm:"Nassau",lv:"Intermediate · 1 LU | HSW",w:[]},
+{day:"wed",s:T(13,0),e:T(14,0),t:"Beyond the Blueprint: Navigating ASHRAE and IECC 2024 Codes with Measured Success",
+ sp:"Joe Briscoe and Paul Farris, Leviton Manufacturing",
+ desc:"With the release of ASHRAE and IECC 2024, lighting control professionals face a new frontier of code compliance that demands deeper understanding. This presentation offers a guided tour through the latest lighting control requirements, with emphasis on how measurement and verification (M&V) plays a critical role, especially in major urban markets like NYC where local energy laws are rapidly evolving.",
+ v:0,rm:"Sutton South",lv:"Introductory · 1 LU | HSW",w:[]},
+{day:"wed",s:T(13,0),e:T(14,0),t:"Where's My Money, Lebowski? Lighting Procurement Uncovered",
+ sp:"Amer Maleh, DeltaLight Group",
+ desc:"Behind every lighting specification lies a journey through the sales and procurement maze where markups multiply, stakeholders scramble for their slice, and budgets bend under pressure. This session pulls back the curtain with insider guidance on how deals really get done, from hidden influencers to value-engineering pitfalls. Participants leave with a clear roadmap to navigate procurement across multiple project typologies without losing their light.",
+ v:0,rm:"Sutton North",lv:"Intermediate · 1 LU | Elective",w:[]},
 {day:"wed",s:T(13,30),e:T(14,30),t:"Lighting the Night Responsibly: Ecology, Beauty & Control",
  sp:"Gabrielle Peace, Lux Botanica",
  desc:"How well-designed outdoor lighting can protect ecosystems, support human wellbeing, and deliver beautiful results. Covers effects of glare, spectrum, and light spill on wildlife, material choices for outdoor luminaires, and practical design strategies with case studies and control technologies.",
@@ -242,6 +296,10 @@ const S=[
  sp:"Jason Livingston, Studio T+L, LLC",
  desc:"The new ANSI/IES LP-30 is a user's guide to TM-30. Reviews LP-30 and its phase-by-phase explanation of how lighting designers can integrate TM-30 into their design workflow, with examples of deliverables for each phase. Attendees receive discounts on TM-30 and LP-30.",
  v:0,rm:"Sutton South",lv:"Intermediate · 1 LU | HSW",w:["Lizzy"]},
+{day:"wed",s:T(14,30),e:T(15,30),t:"Meeting NFPA Backup Power Requirements with Central Inverter Strategy",
+ sp:"John Rimbos, Myers Emergency Power Systems",
+ desc:"Explores how a Central Inverter strategy can meet NFPA backup power requirements for emergency lighting systems while preserving architectural design intent and reducing costs compared to decentralized battery solutions.",
+ v:0,rm:"Sutton North",lv:"Intermediate · 1 LU | HSW",w:[]},
 {day:"wed",s:T(15,0),e:T(16,0),t:"The Greenest Watt Is the One Never Used: Six Lighting Philosophies for a Sustainable Future",
  sp:"Andy Letwin, EN-POWER GROUP",
  desc:"Six philosophies that have guided 140+ NYC projects, generating over $25M in energy savings. From retrofit-first strategies to prioritizing product quality and serviceability. Case studies include the Bowery Hotel and The Dakota.",
@@ -281,11 +339,7 @@ function layout(evs){
   });
   const tc=cols.length;
   sorted.forEach(ev=>{
-    let span=1;
-    for(let c=ev._c+1;c<tc;c++){
-      if(cols[c].some(o=>o.s<ev.e&&o.e>ev.s))break;span++;
-    }
-    ev._sp=span;ev._tc=tc;
+    ev._sp=1;ev._tc=tc;
   });
   return sorted;
 }
@@ -300,7 +354,7 @@ function showDetail(i){
   if(s.lv){s.lv.split(' \u00b7 ').forEach(p=>{
     badges+=`<span class="badge ${p.includes('LU')?'cred':'level'}">${p}</span>`;
   });}
-  const chips=s.w.map(n=>`<span class="d-chip chip ${n.toLowerCase()}">${n}</span>`).join('');
+  const chips=s.w.length?s.w.map(n=>`<span class="d-chip chip ${n.toLowerCase()}">${n}</span>`).join(''):'<span style="color:var(--muted);font-size:13px">No team members registered</span>';
   si.innerHTML=`<div class="d-badges">${badges}</div>
     <div class="d-title">${s.t}</div>
     <div class="d-speakers">${s.sp}</div>
@@ -346,10 +400,11 @@ function render(){
         const left=ev._c*(100/ev._tc), width=ev._sp*(100/ev._tc);
         const sz=ht<55?'sz-xs':ht<85?'sz-s':'';
         const vc=ev.v?'virt':'';
+        const emp=ev.w.length===0?'empty':'';
         const useInitial=ht<55||(ev._tc>1&&ht<85);
-        const chips=ev.w.map(n=>`<span class="chip ${n.toLowerCase()}">${useInitial?n[0]:n}</span>`).join('');
+        const chips=ev.w.length?ev.w.map(n=>`<span class="chip ${n.toLowerCase()}">${useInitial?n[0]:n}</span>`).join(''):'<span class="no-team">No team</span>';
         const rmH=ev.rm&&ht>=55?`<span class="rm">${ev.rm}</span>`:'';
-        html+=`<div class="ev ${sz} ${vc}" style="top:${top}px;height:${ht}px;left:calc(${left}% + 2px);width:calc(${width}% - 6px)" onclick="showDetail(${ev._i})">
+        html+=`<div class="ev ${sz} ${vc} ${emp}" style="top:${top}px;height:${ht}px;left:calc(${left}% + 2px);width:calc(${width}% - 6px)" onclick="showDetail(${ev._i})">
           <div class="etime">${fmt(ev.s)}${ev.v?'<span class="vb">virtual</span>':''}${rmH}</div>
           <div class="etitle">${ev.t}</div>
           <div class="chips">${chips}</div></div>`;
