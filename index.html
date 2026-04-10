@@ -205,7 +205,7 @@ const S=[
 {day:"tue",s:T(9,30),e:T(10,30),t:"BABA, BAA, and Tariffs: Tools for Executing in a Complex and Changing Landscape",
  sp:"Paul Kennedy and Veena Cagle, U.S. Outdoor Lighting",
  desc:"Lighting project requirements for BAA and BABA have increased complexity for current and future compliance, while changing tariffs have further challenged manufacturers, reps, and specifiers. This presentation simplifies understanding of compliance challenges while providing tools to optimize product design and selections, especially considering changing requirements and future uncertainty.",
- v:0,rm:"Sutton South",lv:"Intermediate · 1 LU | Elective",w:["Nick","Lizzy"]},
+ v:0,rm:"Sutton South",lv:"Intermediate · 1 LU | Elective",w:["Nick","Lizzy","Josh"]},
 {day:"tue",s:T(10,0),e:T(11,0),t:"Rugged ITS: Deployment in Rural and Remote Locations",
  sp:"Matt Pollard, Leadsun, Inc.",
  desc:"Rural and remote areas present unique challenges in supporting situational awareness and effective network, incident, and disaster management. Crashes in remote locations tend to be more severe because of delays before help arrives. This presentation explores deploying intelligent transportation system solutions in these challenging environments.",
@@ -259,7 +259,7 @@ const S=[
 {day:"wed",s:T(9,0),e:T(10,30),t:"Sustainable Lighting: A Perspective from the Value Chain",
  sp:"Panel: Maurice Loosschilder (Signify), Migda Colon-Dieppa (Columbia University Facilities), Beth Brenner (Signify)",
  desc:"What is sustainable lighting? This panel provides perspectives along the value chain including the end user, the lighting designer, the installer, and the manufacturer. Panel participants address how they design, procure, and implement sustainable choices and manage stakeholders, sharing real-world examples and guidelines to achieve sustainability goals.",
- v:0,rm:"Sutton North",lv:"Introductory · 1.5 LU | HSW",w:[]},
+ v:0,rm:"Sutton North",lv:"Introductory · 1.5 LU | HSW",w:["Josh"]},
 {day:"wed",s:T(9,30),e:T(11,0),t:"Exploring Emerging Battery Technology",
  sp:"Panel: Sima Tawakoli, Renee Borg, and Todd Judd, sixteen5hundred",
  desc:"Explores the critical role of advanced battery technologies in addressing energy needs for remote, off-grid, and extreme environments. Highlights California's leadership in clean energy and its goal of 100% clean electricity by 2045.",
@@ -267,7 +267,7 @@ const S=[
 {day:"wed",s:T(10,30),e:T(11,30),t:"Specifying Networks for Streaming Lighting Protocols",
  sp:"Nick Gonsman and Kirk Starks, ETC, Inc.",
  desc:"Streaming lighting protocols (Art-Net, sACN) are becoming more prevalent in large lighting control systems, and networks to support these protocols have specific requirements. This session covers how streaming lighting protocols traverse a network (multicast), specifications for topologies and switchgear, configuration guidelines, and utilizing shared networks.",
- v:0,rm:"Nassau",lv:"Intermediate · 1 LU | HSW",w:[]},
+ v:0,rm:"Nassau",lv:"Intermediate · 1 LU | HSW",w:["Josh"]},
 {day:"wed",s:T(11,0),e:T(12,30),t:"21st Century Lighting Technology & Historic Artifacts, Fine Art, Ancient Infrastructure",
  sp:"Panel: Megan Carroll (IES), Amy Nelson (The Metropolitan Museum of Art), Naomi Miller (PNNL, FIES, FIALD)",
  desc:"Technology's impact and opportunity illuminating ancient art and objects in old infrastructure and new construction; converting from incandescent to LEDs in a world-class cultural institution.",
@@ -295,7 +295,7 @@ const S=[
 {day:"wed",s:T(14,30),e:T(15,30),t:"TM-30 for Designers: A Phase by Phase Approach",
  sp:"Jason Livingston, Studio T+L, LLC",
  desc:"The new ANSI/IES LP-30 is a user's guide to TM-30. Reviews LP-30 and its phase-by-phase explanation of how lighting designers can integrate TM-30 into their design workflow, with examples of deliverables for each phase. Attendees receive discounts on TM-30 and LP-30.",
- v:0,rm:"Sutton South",lv:"Intermediate · 1 LU | HSW",w:["Lizzy"]},
+ v:0,rm:"Sutton South",lv:"Intermediate · 1 LU | HSW",w:["Lizzy","Josh"]},
 {day:"wed",s:T(14,30),e:T(15,30),t:"Meeting NFPA Backup Power Requirements with Central Inverter Strategy",
  sp:"John Rimbos, Myers Emergency Power Systems",
  desc:"Explores how a Central Inverter strategy can meet NFPA backup power requirements for emergency lighting systems while preserving architectural design intent and reducing costs compared to decentralized battery solutions.",
@@ -312,11 +312,19 @@ let curPerson="All";
 // Smart day detection: match today's date, or next upcoming, or last day if all past
 function detectDay(){
   const today=new Date();
-  const ts=today.toISOString().slice(0,10);
-  // Exact match
-  const exact=DAYS.find(d=>d.date===ts);
-  if(exact)return exact.k;
-  // Next upcoming
+  const y=today.getFullYear();
+  const m=String(today.getMonth()+1).padStart(2,'0');
+  const d=String(today.getDate()).padStart(2,'0');
+  const ts=`${y}-${m}-${d}`;
+  const hour=today.getHours();
+  // Exact date match
+  const idx=DAYS.findIndex(d=>d.date===ts);
+  if(idx!==-1){
+    // After 5 PM, advance to next conference day
+    if(hour>=17&&idx<DAYS.length-1)return DAYS[idx+1].k;
+    return DAYS[idx].k;
+  }
+  // Between conference days, show next upcoming
   const upcoming=DAYS.filter(d=>d.date>ts);
   if(upcoming.length)return upcoming[0].k;
   // All past, show last day
@@ -391,7 +399,7 @@ function render(){
       html+=`</div>`;
       for(let m=ds;m<=de;m+=30){html+=`<div class="gl ${m%60===0?'h':'m'}" style="top:${(m-ds)*PPM}px"></div>`;}
       const now=new Date(),nm=now.getHours()*60+now.getMinutes();
-      const todayISO=now.toISOString().slice(0,10);
+      const todayISO=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
       const isToday=d.date===todayISO;
       if(isToday&&nm>=ds&&nm<=de)html+=`<div class="now" id="now-line" style="top:${(nm-ds)*PPM}px"><span class="now-time">${fmt(nm)}</span></div>`;
 
@@ -479,7 +487,7 @@ setInterval(()=>{
   if(!dayDiv)return;
   const dk=dayDiv.dataset.d;
   const dayObj=DAYS.find(d=>d.k===dk);
-  if(!dayObj||dayObj.date!==now.toISOString().slice(0,10))return;
+  if(!dayObj||dayObj.date!==`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`)return;
   // Recalculate position from visible events
   const evs=filtered().filter(s=>s.day===dk);
   if(!evs.length)return;
