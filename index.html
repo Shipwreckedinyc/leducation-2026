@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>LEDucation 2026 — BH Team Schedule</title>
+<style>
+  :root {
+    --bg: #0d1117; --surface: #161b22; --surface2: #1c2129;
+    --border: #21262d; --border2: #30363d;
+    --text: #e6edf3; --dim: #8b949e; --muted: #6e7681;
+    --accent: #58a6ff; --accent-dim: rgba(88,166,255,0.12);
+    --nick: #2d6cb4; --lizzy: #8b3a7d; --josh: #2d8b6a;
+    --maya: #b47a2d; --andrew: #8b3a3a; --wei: #5a5a9b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body { font-family: -apple-system, 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; }
+
+  .hdr { position: sticky; top: 0; z-index: 50; background: var(--bg); border-bottom: 1px solid var(--border); }
+  .hdr-inner { padding: 12px 16px 0; }
+  .hdr h1 { font-size: 16px; font-weight: 700; }
+  .hdr .sub { font-size: 11px; color: var(--muted); margin: 1px 0 0; }
+
+  /* PERSON PILLS */
+  .people { display: flex; gap: 6px; padding: 10px 16px 0; overflow-x: auto; scrollbar-width: none; }
+  .people::-webkit-scrollbar { display: none; }
+  .pill { padding: 5px 12px; font-size: 12px; font-weight: 600; border-radius: 16px;
+    border: 1.5px solid var(--border2); background: transparent; color: var(--dim);
+    cursor: pointer; white-space: nowrap; transition: all 0.15s; flex-shrink: 0; }
+  .pill.on { color: #fff; }
+  .pill[data-p="All"].on { background: var(--accent); border-color: var(--accent); }
+  .pill[data-p="Nick"].on { background: var(--nick); border-color: var(--nick); }
+  .pill[data-p="Lizzy"].on { background: var(--lizzy); border-color: var(--lizzy); }
+  .pill[data-p="Josh"].on { background: var(--josh); border-color: var(--josh); }
+  .pill[data-p="Maya"].on { background: var(--maya); border-color: var(--maya); }
+  .pill[data-p="Andrew"].on { background: var(--andrew); border-color: var(--andrew); }
+  .pill[data-p="Wei"].on { background: var(--wei); border-color: var(--wei); }
+  .pill .pct { font-size: 10px; opacity: 0.7; margin-left: 2px; font-weight: 400; }
+
+  /* DAY TABS */
+  .tabs { display: flex; overflow-x: auto; scrollbar-width: none; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab { flex: 1; min-width: 0; padding: 9px 4px; font-size: 12px; font-weight: 500;
+    color: var(--muted); background: none; border: none; border-bottom: 2px solid transparent;
+    cursor: pointer; text-align: center; white-space: nowrap; }
+  .tab.on { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+  .tab .ct { font-size: 10px; background: var(--surface); color: var(--dim); border-radius: 8px;
+    padding: 1px 5px; margin-left: 3px; }
+  .tab.on .ct { background: var(--accent-dim); color: var(--accent); }
+
+  /* CALENDAR */
+  .day { display: none; padding: 0 0 60px; }
+  .day.on { display: block; }
+  .cal { position: relative; margin: 0 0 0 50px; }
+  .tg { position: absolute; left: -50px; top: 0; width: 46px; height: 100%; pointer-events: none; }
+  .tl { position: absolute; right: 2px; font-size: 10px; color: var(--muted); font-variant-numeric: tabular-nums; transform: translateY(-7px); }
+  .gl { position: absolute; left: 0; right: 0; height: 1px; }
+  .gl.h { background: var(--border); } .gl.m { background: rgba(33,38,45,0.4); }
+  .now { position: absolute; left: -4px; right: 0; height: 2px; background: #f85149; z-index: 15; pointer-events: none; }
+  .now::before { content: ''; position: absolute; left: -3px; top: -3px; width: 8px; height: 8px; border-radius: 50%; background: #f85149; animation: pulse 2s ease-in-out infinite; }
+  .now-time { position: absolute; left: 8px; top: -8px; font-size: 9px; font-weight: 700; color: #f85149;
+    background: var(--bg); padding: 0 3px; border-radius: 2px; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.3)} }
+
+  /* EVENTS */
+  .ev { position: absolute; border-radius: 6px; padding: 6px 8px; overflow: hidden; cursor: pointer;
+    border: 1px solid var(--border); background: var(--surface); transition: transform 0.1s; }
+  .ev:active { transform: scale(0.98); }
+  .ev.virt { border-style: dashed; }
+  .ev .etime { font-size: 10px; color: var(--dim); font-weight: 600; margin-bottom: 1px; display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+  .ev .vb { font-size: 8px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent);
+    background: var(--accent-dim); padding: 1px 4px; border-radius: 3px; font-weight: 700; }
+  .ev .rm { font-size: 9px; color: var(--muted); }
+  .ev .etitle { font-size: 12px; font-weight: 600; line-height: 1.25; margin: 2px 0 4px;
+    display: -webkit-box; -webkit-box-orient: vertical; overflow: hidden; }
+  .ev .chips { display: flex; flex-wrap: wrap; gap: 3px; }
+  .chip { font-size: 10px; font-weight: 600; padding: 1px 6px; border-radius: 4px; color: #fff; line-height: 1.5; }
+  .chip.nick { background: var(--nick); } .chip.lizzy { background: var(--lizzy); }
+  .chip.josh { background: var(--josh); } .chip.maya { background: var(--maya); }
+  .chip.andrew { background: var(--andrew); } .chip.wei { background: var(--wei); }
+  .ev.sz-s .etitle { -webkit-line-clamp: 2; font-size: 11px; }
+  .ev.sz-s .chips { gap: 2px; } .ev.sz-s .chip { font-size: 9px; padding: 0 4px; }
+  .ev.sz-xs .etitle { -webkit-line-clamp: 1; font-size: 10px; margin: 1px 0 2px; }
+  .ev.sz-xs .etime { font-size: 9px; margin-bottom: 0; }
+  .ev.sz-xs .chips { gap: 2px; } .ev.sz-xs .chip { font-size: 8px; padding: 0 3px; }
+
+  /* EMPTY STATE */
+  .empty-day { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 13px; }
+
+  /* DETAIL SHEET */
+  .ov { display: none; position: fixed; inset: 0; z-index: 200; background: rgba(0,0,0,0.55); }
+  .ov.on { display: flex; align-items: flex-end; justify-content: center; }
+  .sheet { width: 100%; max-width: 520px; max-height: 85vh; background: var(--surface);
+    border-radius: 16px 16px 0 0; overflow-y: auto; animation: su 0.22s ease-out; -webkit-overflow-scrolling: touch; }
+  @keyframes su { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  .sheet-inner { padding: 0 16px 32px; }
+  .handle { width: 36px; height: 4px; background: var(--border2); border-radius: 2px; margin: 10px auto 14px; cursor: pointer; }
+  .d-badges { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 10px; }
+  .badge { font-size: 11px; padding: 3px 8px; border-radius: 5px; font-weight: 600; }
+  .badge.time { background: var(--accent-dim); color: var(--accent); }
+  .badge.room { background: rgba(139,148,158,0.12); color: var(--dim); }
+  .badge.cred { background: rgba(63,185,80,0.1); color: #3fb950; }
+  .badge.level { background: rgba(210,153,34,0.1); color: #d29922; }
+  .badge.virt-b { background: rgba(88,166,255,0.08); color: var(--accent); border: 1px dashed rgba(88,166,255,0.3); }
+  .d-title { font-size: 18px; font-weight: 700; line-height: 1.25; margin-bottom: 8px; }
+  .d-speakers { font-size: 13px; color: var(--dim); line-height: 1.4; margin-bottom: 12px; }
+  .d-desc { font-size: 13px; line-height: 1.55; color: var(--dim); margin-bottom: 16px; }
+  .d-who-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); font-weight: 600; margin-bottom: 6px; }
+  .d-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .d-chip { font-size: 13px; font-weight: 600; padding: 5px 12px; border-radius: 6px; color: #fff; }
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-inner">
+    <h1>LEDucation 2026</h1>
+    <p class="sub">Buro Happold Lighting · Team Schedule</p>
+    <div class="people" id="people"></div>
+  </div>
+  <div class="tabs" id="tabs"></div>
+</div>
+<div id="content"></div>
+
+<div class="ov" id="ov" onclick="if(event.target===this)closeOv()">
+  <div class="sheet"><div class="handle" onclick="closeOv()"></div><div class="sheet-inner" id="si"></div></div>
+</div>
+
+<script>
+const T=(h,m)=>h*60+m, PPM=2.2;
+const PEOPLE=["All","Nick","Lizzy","Josh","Maya","Andrew","Wei"];
+const DAYS=[
+  {k:"thu",label:"Thu 4/9",date:"2026-04-09"},{k:"fri",label:"Fri 4/10",date:"2026-04-10"},
+  {k:"tue",label:"Tue 4/14",date:"2026-04-14"},{k:"wed",label:"Wed 4/15",date:"2026-04-15"}
+];
+
+const S=[
+// ── THU ──
+{day:"thu",s:T(10,15),e:T(11,15),t:"Lighting Design for Revit using TM32 and IFC",
+ sp:"Friedrich Wilhelm Bremecker, DIAL",
+ desc:"Lighting design requires both specialized expertise and dedicated tools. General BIM software excels in architecture but falls short on lighting details. The new IES TM-32 defines the essential luminaire data for accurate BIM-based lighting design. DIALux fully supports this standard: over 450 manufacturers supply product data, and results integrate seamlessly with BIM authoring tools via IFC (OpenBIM) or a dedicated Revit App (ClosedBIM).",
+ v:1,rm:"",lv:"Introductory · 1 LU | Elective",w:["Nick"]},
+{day:"thu",s:T(11,30),e:T(12,30),t:"Beyond the Building: Mapping Health-Centered LED Lighting with GIS",
+ sp:"Jianchuan Tan, PNNL and Shengliang \"Daniel\" Rong, Delos Living LLC",
+ desc:"This presentation introduces a spatial, data-driven approach using Geographic Information Systems (GIS) to assess the broader public health implications of LED lighting aligned with the WELL Building Standard. By layering open datasets on light pollution, sleep insufficiency, demographics, and lighting infrastructure, we reveal spatial disparities in light exposure and wellness conditions across communities.",
+ v:1,rm:"",lv:"Intermediate · 1 LU | HSW",w:["Lizzy","Josh","Maya","Wei"]},
+{day:"thu",s:T(13,0),e:T(14,30),t:"The Challenge of Talking Technical to Customers",
+ sp:"Panel: Mary Beth Gotti (American Lighting Association), Jeffrey Dross (Lighting by Jeffrey), Laurie Gross (Gross Electric)",
+ desc:"In the last twenty years, lighting in the residential space has undergone a massive transition. Recent scientific findings indicate the connection between light and humans, the environment, and animals is even more pervasive than originally believed. This session lays out the problem and offers solutions for better lighting communication.",
+ v:1,rm:"",lv:"Intermediate · 1.5 LU | Elective",w:["Nick","Maya"]},
+{day:"thu",s:T(14,45),e:T(15,45),t:"More Time for Design: Leveraging AI and Coding to Boost Efficiency and Quality",
+ sp:"Junrui Wang, Spark Studio Lighting Design",
+ desc:"Lighting designers often face time-intensive administrative tasks that limit opportunities for creative exploration. This session demonstrates how coding, AI, and unconventional digital tools can streamline workflows, reduce errors, and free more time for design thinking. Real-world examples cover automating manufacturer lists with PyCharm and Google Sheets, generating cut packages using ChatGPT and Adobe Acrobat, and producing fixture schedules and LPD calculations through BIM360 Revit integrations.",
+ v:1,rm:"",lv:"Intermediate · 1 LU | HSW",w:["Nick","Lizzy","Josh","Maya"]},
+{day:"thu",s:T(16,0),e:T(17,0),t:"Tools for Impactful Decision-Making in Lighting Systems",
+ sp:"Kate Hickcox, Pacific Northwest National Laboratory",
+ desc:"Explore the luminaire life cycle inventory (LCI) template developed by PNNL, designed to drive advancements in resource efficiency and supply chain security. Learn how the LCI template streamlines data-driven decision-making across economic, resource, and supply chain dimensions, including compliance with the Build America, Buy America (BABA) Act.",
+ v:1,rm:"",lv:"Intermediate · 1 LU | HSW",w:["Josh"]},
+{day:"thu",s:T(17,15),e:T(18,15),t:"How 3D Printing Can Bring Positive Change to the Lighting Industry (and the World)",
+ sp:"Bart Maeyens, Signify NV",
+ desc:"A new era in lighting through advanced 3D printing, offering customizable, sustainable solutions. By leveraging local production, recycled materials, and digital design tools, we can reduce environmental impact while enhancing speed, flexibility, and aesthetic freedom, supporting circular economy goals without compromising performance.",
+ v:1,rm:"",lv:"Intermediate · 1 LU | HSW",w:["Nick","Josh","Andrew"]},
+
+// ── FRI ──
+{day:"fri",s:T(10,15),e:T(11,15),t:"Beyond NLCs: What Is Next For Connected Lighting",
+ sp:"Simon Slupik, Silvair / Chair, Bluetooth Mesh Working Group (Bluetooth SIG)",
+ desc:"High-end trim, dimming, occupancy/vacancy, and daylight harvesting have been mainstream applications for connected lighting systems. But this is just a beginning, as bringing connectivity to lighting systems can offer much more.",
+ v:1,rm:"",lv:"Introductory · 1 LU | HSW",w:["Nick"]},
+{day:"fri",s:T(13,0),e:T(14,30),t:"Hospitality Lighting Case Studies at Scale: Dynamic Lighting on Network Controls",
+ sp:"Panel: Tyler Andrews (PoE Texas), Mark Simpson (Celano Design Studio), Joe Herbst (PoE Texas)",
+ desc:"Two successful luxury hospitality case studies focused on user experience using Power over Ethernet (PoE) lighting controls: Black Desert Resort (2M sqft) and Resorts World's Villa 66 (exclusive penthouse suite). Includes video footage and project participants.",
+ v:1,rm:"",lv:"Intermediate · 1.5 LU | HSW",w:["Nick","Maya","Andrew","Wei"]},
+{day:"fri",s:T(14,45),e:T(15,45),t:"MAYRIT: Light and Vibration, a Sensory Experience for Everyone",
+ sp:"Ezequiel Nobili, Don Lucero",
+ desc:"\"Mayrit. Water, Stone, Fire, and Flesh.\" An ephemeral site-specific work from the LuzMadrid 2023 Festival that revalues the Arab wall of Madrid. Using olfactory, tactile, visual, and auditory devices, it offers an accessible multisensory experience that dissolves boundaries.",
+ v:1,rm:"",lv:"Introductory · 1 LU | HSW",w:["Nick","Josh","Maya"]},
+{day:"fri",s:T(16,0),e:T(17,0),t:"Design for the Mind: Neurodivergence, PTSD, and the Future of Biophilic Lighting",
+ sp:"Xander Cadisch, Light Tribe by Phos Ltd",
+ desc:"Combines personal insight and professional expertise to explore how neurodivergence and trauma-informed design can revolutionize biophilic lighting. Drawing on the presenter's experience living with PTSD and research from the book The Light Within Us, it examines how thoughtful design can profoundly impact emotional health, sensory comfort, and overall wellbeing.",
+ v:1,rm:"",lv:"Intermediate · 1 LU | HSW",w:["Nick","Lizzy","Josh","Maya","Wei"]},
+{day:"fri",s:T(17,15),e:T(18,15),t:"Endogenously Triggered Visual Gamma Stimulation for Alzheimer's Disease Prevention",
+ sp:"Matthew Maa and Judy Luo, Aleddra LED Lighting",
+ desc:"Introduces groundbreaking technology that induces non-perceptible gamma stimulation in the brain. A double-blind clinical trial of a table lamp is presented with data showing clear gamma stimulation and cognitive improvement after 1-month treatment. This opens the door to embedding such technology in almost all indoor lighting applications.",
+ v:1,rm:"",lv:"Intermediate · 1 LU | HSW",w:["Nick","Lizzy","Maya"]},
+
+// ── TUE ──
+{day:"tue",s:T(9,30),e:T(10,30),t:"BABA, BAA, and Tariffs: Tools for Executing in a Complex and Changing Landscape",
+ sp:"Paul Kennedy and Veena Cagle, U.S. Outdoor Lighting",
+ desc:"Lighting project requirements for BAA and BABA have increased complexity for current and future compliance, while changing tariffs have further challenged manufacturers, reps, and specifiers. This presentation simplifies understanding of compliance challenges while providing tools to optimize product design and selections, especially considering changing requirements and future uncertainty.",
+ v:0,rm:"Sutton South",lv:"Intermediate · 1 LU | Elective",w:["Nick","Lizzy"]},
+{day:"tue",s:T(10,30),e:T(11,30),t:"Future of LED Drivers",
+ sp:"Michael Kulkarni, Sintel Power Systems (Division of Sintel Inc.)",
+ desc:"What does the Next Generation LED Driver look like? Can we make smaller fixtures with less materials that are greener and less reliant on global supply chains?",
+ v:0,rm:"Sutton North",lv:"Introductory · 1 LU | HSW",w:["Nick","Andrew"]},
+{day:"tue",s:T(11,30),e:T(12,30),t:"Lighting to Support Human Health and Wellbeing",
+ sp:"Dr. Mariana Figueiro, Mount Sinai Professor of Light and Health Research",
+ desc:"Covers how light affects people through vision, perceptual, and circadian/alerting systems. Reviews lighting characteristics affecting visual acuity, glare, comfort, and color perception, then describes impacts on sleep, mood, cognition, and behavior. Includes designing for UL24480 Circadian Entrainment guideline and WELL Building Standard, plus how eye physiology changes with age.",
+ v:0,rm:"Sutton South",lv:"Introductory · 1 LU | HSW",w:["Maya","Wei"]},
+{day:"tue",s:T(12,0),e:T(13,0),t:"Beyond Illumination: Smart Lighting in the 2030 Smart Building Environment",
+ sp:"Beatrice Witzgall, In3Design (Siemens)",
+ desc:"By 2030, lighting will become an intelligent, adaptive system at the heart of smart buildings. This talk explores how lighting integrates with building ecosystems, driving sustainability, energy optimization, and occupant well-being. From wireless controls and interoperability to AI-driven personalization.",
+ v:0,rm:"Nassau",lv:"Intermediate · 1 LU | HSW",w:["Nick"]},
+{day:"tue",s:T(12,0),e:T(13,30),t:"Lighting's Blurred Lines: Where Design Ends and Consultation Begins",
+ sp:"Panel: JP Bedell (SDA Lighting), Scott Hay (Reveal Design Group), Michael Hennes (Cline Bettridge Bernstein), C. Brooke Silber (Borealis Studio / BR+A), Dorothy Underwood (KGM Lighting)",
+ desc:"Explores the value of distinguishing between lighting design and lighting consultation. Consultation typically involves basic layouts, code compliance, and performance-based specs. Lighting design integrates artistic vision, technical rigor, and detailed mockups. The panel debates whether defining these roles more clearly could protect design integrity, clarify contracts, and reflect real-world project scopes.",
+ v:0,rm:"Sutton North",lv:"Intermediate · 1.5 LU | Elective",w:["Lizzy","Josh","Andrew"]},
+{day:"tue",s:T(13,30),e:T(14,30),t:"Egos, Intuition, & Lumens: Decoding the Architect's Mind",
+ sp:"Brian Maite (ALW, an LMPG Brand) and Katie Hawk (FSA Lighting)",
+ desc:"Architects balance countless technical responsibilities with instinct and vision, communicating in language that is uniquely \"Architect.\" This creates communication gaps with lighting professionals. Former architects and PMs now in lighting explore where disconnects arise and the importance of bridging the language of lighting.",
+ v:0,rm:"Nassau",lv:"Intermediate · 1 LU | Elective",w:["Maya"]},
+{day:"tue",s:T(14,0),e:T(15,30),t:"Whose Daylight Is It Anyway? Scope, Money, and Control Across the Design Team",
+ sp:"Panel: Doug Kafka (Lutron), Ryan Merluza (M Moser Associates), Brian Stacy (Arup), Michael Mehl (LightBox Studios)",
+ desc:"Unpacks scope, risk, and responsibility for daylight design and control integration. An architect, lighting designer, and daylight study specialist trade lessons on aligning design intent, sequences of operation, and budgets. Shows why electric lighting rarely performs as intended without coordinated window treatments and smart controls.",
+ v:0,rm:"Sutton North",lv:"1.5 LU | HSW",w:["Andrew"]},
+{day:"tue",s:T(14,30),e:T(15,30),t:"Bright Ideas Need Safe Spaces: Building a Culture of Creativity",
+ sp:"Rebecca Mintz (Peak Wavelength Strategies / George Mason University) and David Seok (The Lighting Practice)",
+ desc:"Lighting design depends on creativity, but creativity doesn't flourish by chance. It grows in cultures that support risk-taking, idea-sharing, and cross-disciplinary collaboration. Drawing from design practice and organizational psychology, this session explores what separates teams that consistently produce innovative work from those that stall. Attendees will gain tools to cultivate environments where experimentation is encouraged, burnout is reduced, and engagement is high.",
+ v:0,rm:"Sutton South",lv:"Introductory · 1 LU | Elective",w:["Lizzy","Josh","Maya","Wei"]},
+{day:"tue",s:T(16,0),e:T(17,0),t:"More Isn't Always Enough: Light and Perceived Safety of Subway Platforms",
+ sp:"Hyesoo Chun, The Lighting Practice",
+ desc:"Since 2024, NYC subway platforms have undergone fluorescent-to-LED conversions. Field surveys and studies reveal higher brightness alone does not enhance perceived safety; luminance ratio plays a more significant role in fostering visual comfort and sense of security.",
+ v:0,rm:"Sutton South",lv:"Intermediate · 1 LU | HSW",w:["Josh"]},
+{day:"tue",s:T(16,0),e:T(17,0),t:"Seeing Like a Cinematographer: Lighting That Shapes Emotion",
+ sp:"Tal Lazar, Latent Images",
+ desc:"Cinematographers choreograph emotion, guide attention, and shape meaning through light. Every frame of a film is a lesson in how illumination tells a story. Through vivid examples from iconic movie scenes, participants explore cinematic techniques that unlock fresh ways of thinking about their own work.",
+ v:0,rm:"Sutton North",lv:"Introductory · 1 LU | Elective",w:["Lizzy","Maya"]},
+
+// ── WED ──
+{day:"wed",s:T(11,0),e:T(12,30),t:"21st Century Lighting Technology & Historic Artifacts, Fine Art, Ancient Infrastructure",
+ sp:"Panel: Megan Carroll (IES), Amy Nelson (The Metropolitan Museum of Art), Naomi Miller (PNNL, FIES, FIALD)",
+ desc:"Technology's impact and opportunity illuminating ancient art and objects in old infrastructure and new construction; converting from incandescent to LEDs in a world-class cultural institution.",
+ v:0,rm:"Sutton North",lv:"Intermediate · 1.5 LU | HSW",w:["Lizzy","Wei"]},
+{day:"wed",s:T(11,30),e:T(12,30),t:"The Broken Windows Theory as Applied to Lighting: Designing Environments that Signal Care",
+ sp:"Francesca Bastianini, Sighte Studio",
+ desc:"The criminological Broken Windows Theory suggests visible signs of neglect invite further disorder. Applied to lighting, this is about how the pursuit of efficiency and cost savings can erode community pride. High-output, low-cost fixtures may illuminate broadly but often create glare and the perception of surveillance rather than care. Explores strategies for working with municipalities to prioritize quality and human experience.",
+ v:0,rm:"Sutton South",lv:"Introductory · 1 LU | HSW",w:["Josh","Maya"]},
+{day:"wed",s:T(13,30),e:T(14,30),t:"Lighting the Night Responsibly: Ecology, Beauty & Control",
+ sp:"Gabrielle Peace, Lux Botanica",
+ desc:"How well-designed outdoor lighting can protect ecosystems, support human wellbeing, and deliver beautiful results. Covers effects of glare, spectrum, and light spill on wildlife, material choices for outdoor luminaires, and practical design strategies with case studies and control technologies.",
+ v:0,rm:"Nassau",lv:"Introductory · 1 LU | HSW",w:["Josh","Maya","Andrew"]},
+{day:"wed",s:T(14,30),e:T(15,30),t:"TM-30 for Designers: A Phase by Phase Approach",
+ sp:"Jason Livingston, Studio T+L, LLC",
+ desc:"The new ANSI/IES LP-30 is a user's guide to TM-30. Reviews LP-30 and its phase-by-phase explanation of how lighting designers can integrate TM-30 into their design workflow, with examples of deliverables for each phase. Attendees receive discounts on TM-30 and LP-30.",
+ v:0,rm:"Sutton South",lv:"Intermediate · 1 LU | HSW",w:["Lizzy"]},
+{day:"wed",s:T(15,0),e:T(16,0),t:"The Greenest Watt Is the One Never Used: Six Lighting Philosophies for a Sustainable Future",
+ sp:"Andy Letwin, EN-POWER GROUP",
+ desc:"Six philosophies that have guided 140+ NYC projects, generating over $25M in energy savings. From retrofit-first strategies to prioritizing product quality and serviceability. Case studies include the Bowery Hotel and The Dakota.",
+ v:0,rm:"Nassau",lv:"Introductory · 1 LU | HSW",w:["Maya","Andrew"]}
+];
+
+// ── ENGINE ──
+let curPerson="All";
+
+// Smart day detection: match today's date, or next upcoming, or last day if all past
+function detectDay(){
+  const today=new Date();
+  const ts=today.toISOString().slice(0,10);
+  // Exact match
+  const exact=DAYS.find(d=>d.date===ts);
+  if(exact)return exact.k;
+  // Next upcoming
+  const upcoming=DAYS.filter(d=>d.date>ts);
+  if(upcoming.length)return upcoming[0].k;
+  // All past, show last day
+  return DAYS[DAYS.length-1].k;
+}
+let curDay=detectDay();
+function fmt(m){const h=Math.floor(m/60),mn=m%60,a=h>=12?"PM":"AM",h2=h>12?h-12:h||12;return mn?`${h2}:${String(mn).padStart(2,'0')} ${a}`:`${h2} ${a}`;}
+function fmtR(a,b){return fmt(a)+' \u2013 '+fmt(b);}
+
+function layout(evs){
+  if(!evs.length)return[];
+  const sorted=evs.slice().sort((a,b)=>a.s-b.s||a.e-b.e);
+  const cols=[];
+  sorted.forEach(ev=>{
+    let placed=false;
+    for(let c=0;c<cols.length;c++){
+      if(ev.s>=cols[c][cols[c].length-1].e){cols[c].push(ev);ev._c=c;placed=true;break;}
+    }
+    if(!placed){ev._c=cols.length;cols.push([ev]);}
+  });
+  const tc=cols.length;
+  sorted.forEach(ev=>{
+    let span=1;
+    for(let c=ev._c+1;c<tc;c++){
+      if(cols[c].some(o=>o.s<ev.e&&o.e>ev.s))break;span++;
+    }
+    ev._sp=span;ev._tc=tc;
+  });
+  return sorted;
+}
+
+function range(evs){let mn=1440,mx=0;evs.forEach(e=>{if(e.s<mn)mn=e.s;if(e.e>mx)mx=e.e;});return{ds:Math.floor(mn/60)*60,de:Math.ceil(mx/60)*60};}
+
+function showDetail(i){
+  const s=S[i],si=document.getElementById('si');
+  let badges=`<span class="badge time">${fmtR(s.s,s.e)}</span>`;
+  if(s.v)badges+=`<span class="badge virt-b">Virtual</span>`;
+  if(s.rm)badges+=`<span class="badge room">${s.rm}</span>`;
+  if(s.lv){s.lv.split(' \u00b7 ').forEach(p=>{
+    badges+=`<span class="badge ${p.includes('LU')?'cred':'level'}">${p}</span>`;
+  });}
+  const chips=s.w.map(n=>`<span class="d-chip chip ${n.toLowerCase()}">${n}</span>`).join('');
+  si.innerHTML=`<div class="d-badges">${badges}</div>
+    <div class="d-title">${s.t}</div>
+    <div class="d-speakers">${s.sp}</div>
+    <div class="d-desc">${s.desc}</div>
+    <div class="d-who-label">Team attending</div>
+    <div class="d-chips">${chips}</div>`;
+  document.getElementById('ov').classList.add('on');
+  document.body.style.overflow='hidden';
+}
+function closeOv(){document.getElementById('ov').classList.remove('on');document.body.style.overflow='';}
+
+function filtered(){
+  return S.map((s,i)=>({...s,_i:i})).filter(s=>{
+    if(curPerson!=="All"&&!s.w.includes(curPerson))return false;
+    return true;
+  });
+}
+
+function render(){
+  const all=filtered();
+  let html='';
+  DAYS.forEach(d=>{
+    const evs=all.filter(s=>s.day===d.k);
+    html+=`<div class="day${d.k===curDay?' on':''}" data-d="${d.k}">`;
+    if(!evs.length){
+      html+=`<div class="empty-day">No sessions${curPerson!=="All"?' for '+curPerson:''} on this day</div>`;
+    } else {
+      const{ds,de}=range(evs);
+      const th=(de-ds)*PPM;
+      const laid=layout(evs);
+      html+=`<div class="cal" style="height:${th+12}px;margin:8px 8px 0 50px">`;
+      html+=`<div class="tg">`;
+      for(let m=ds;m<=de;m+=30)html+=`<span class="tl" style="top:${(m-ds)*PPM}px">${fmt(m)}</span>`;
+      html+=`</div>`;
+      for(let m=ds;m<=de;m+=30){html+=`<div class="gl ${m%60===0?'h':'m'}" style="top:${(m-ds)*PPM}px"></div>`;}
+      const now=new Date(),nm=now.getHours()*60+now.getMinutes();
+      const todayISO=now.toISOString().slice(0,10);
+      const isToday=d.date===todayISO;
+      if(isToday&&nm>=ds&&nm<=de)html+=`<div class="now" id="now-line" style="top:${(nm-ds)*PPM}px"><span class="now-time">${fmt(nm)}</span></div>`;
+
+      laid.forEach(ev=>{
+        const top=(ev.s-ds)*PPM, ht=Math.max((ev.e-ev.s)*PPM-2,30);
+        const left=ev._c*(100/ev._tc), width=ev._sp*(100/ev._tc);
+        const sz=ht<55?'sz-xs':ht<85?'sz-s':'';
+        const vc=ev.v?'virt':'';
+        const useInitial=ht<55||(ev._tc>1&&ht<85);
+        const chips=ev.w.map(n=>`<span class="chip ${n.toLowerCase()}">${useInitial?n[0]:n}</span>`).join('');
+        const rmH=ev.rm&&ht>=55?`<span class="rm">${ev.rm}</span>`:'';
+        html+=`<div class="ev ${sz} ${vc}" style="top:${top}px;height:${ht}px;left:calc(${left}% + 2px);width:calc(${width}% - 6px)" onclick="showDetail(${ev._i})">
+          <div class="etime">${fmt(ev.s)}${ev.v?'<span class="vb">virtual</span>':''}${rmH}</div>
+          <div class="etitle">${ev.t}</div>
+          <div class="chips">${chips}</div></div>`;
+      });
+      html+=`</div>`;
+    }
+    html+=`</div>`;
+  });
+  document.getElementById('content').innerHTML=html;
+  updateTabCounts();
+}
+
+function updateTabCounts(){
+  const all=filtered();
+  document.querySelectorAll('.tab').forEach(t=>{
+    const dk=t.dataset.d;
+    const ct=all.filter(s=>s.day===dk).length;
+    t.querySelector('.ct').textContent=ct;
+  });
+}
+
+// ── INIT ──
+const peopleEl=document.getElementById('people');
+PEOPLE.forEach(p=>{
+  const b=document.createElement('button');
+  b.className='pill'+(p==='All'?' on':'');
+  b.dataset.p=p;
+  const ct=p==='All'?S.length:S.filter(s=>s.w.includes(p)).length;
+  b.innerHTML=`${p}<span class="pct">${ct}</span>`;
+  b.onclick=()=>{
+    curPerson=p;
+    document.querySelectorAll('.pill').forEach(x=>x.classList.toggle('on',x.dataset.p===p));
+    render();
+  };
+  peopleEl.appendChild(b);
+});
+
+const tabsEl=document.getElementById('tabs');
+DAYS.forEach((d,i)=>{
+  const b=document.createElement('button');
+  b.className='tab'+(d.k===curDay?' on':'');b.dataset.d=d.k;
+  b.innerHTML=`${d.label}<span class="ct">0</span>`;
+  b.onclick=()=>{
+    curDay=d.k;
+    document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('on',t.dataset.d===d.k));
+    document.querySelectorAll('.day').forEach(c=>c.classList.toggle('on',c.dataset.d===d.k));
+  };
+  tabsEl.appendChild(b);
+});
+
+render();
+
+// Scroll to now-line on load (slight delay for DOM paint)
+setTimeout(()=>{
+  const nl=document.getElementById('now-line');
+  if(nl){
+    const rect=nl.getBoundingClientRect();
+    const offset=rect.top+window.scrollY-window.innerHeight*0.35;
+    window.scrollTo({top:Math.max(0,offset),behavior:'smooth'});
+  }
+},120);
+
+// Live-update now-line every 60s
+setInterval(()=>{
+  const nl=document.getElementById('now-line');
+  if(!nl)return;
+  const now=new Date(),nm=now.getHours()*60+now.getMinutes();
+  // Find day start from the calendar container
+  const cal=nl.parentElement;
+  if(!cal)return;
+  const dayDiv=cal.parentElement;
+  if(!dayDiv)return;
+  const dk=dayDiv.dataset.d;
+  const dayObj=DAYS.find(d=>d.k===dk);
+  if(!dayObj||dayObj.date!==now.toISOString().slice(0,10))return;
+  // Recalculate position from visible events
+  const evs=filtered().filter(s=>s.day===dk);
+  if(!evs.length)return;
+  const{ds}=range(evs);
+  nl.style.top=(nm-ds)*PPM+'px';
+  const tlabel=nl.querySelector('.now-time');
+  if(tlabel)tlabel.textContent=fmt(nm);
+},60000);
+
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeOv();});
+</script>
+</body>
+</html>
